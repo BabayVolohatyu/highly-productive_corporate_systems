@@ -1,5 +1,6 @@
 package org.example.monitoring.server;
 
+import org.example.monitoring.aop.BudgetExceededException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +27,12 @@ public class ApiExceptionHandler {
     @ExceptionHandler(InvalidRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> invalid(InvalidRequestException exception) {
+        return Map.of("error", exception.getMessage());
+    }
+
+    @ExceptionHandler(BudgetExceededException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public Map<String, String> budgetExceeded(BudgetExceededException exception) {
         return Map.of("error", exception.getMessage());
     }
 

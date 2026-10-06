@@ -1,5 +1,6 @@
 package org.example.monitoring.server;
 
+import org.example.monitoring.aop.BudgetExceededException;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -42,6 +43,13 @@ class ApiExceptionHandlerTest {
 
         // Assert
         assertThat(body).containsEntry("error", "hostname is required");
+    }
+
+    @Test
+    void budgetExceeded_returnsErrorMessage() {
+        Map<String, String> body = handler.budgetExceeded(new BudgetExceededException("Execution budget exceeded for findAll"));
+
+        assertThat(body).containsEntry("error", "Execution budget exceeded for findAll");
     }
 
     @Test

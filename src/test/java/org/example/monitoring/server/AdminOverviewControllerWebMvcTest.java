@@ -1,5 +1,7 @@
 package org.example.monitoring.server;
 
+import org.example.monitoring.aop.CallMeter;
+import org.example.monitoring.aop.OperationTimings;
 import org.example.monitoring.config.WebMvcConfig;
 import org.example.monitoring.web.CurrentOperatorArgumentResolver;
 import org.junit.jupiter.api.Test;
@@ -27,14 +29,24 @@ class AdminOverviewControllerWebMvcTest {
     @MockitoBean
     private ServerService serverService;
 
+    @MockitoBean
+    private CallMeter callMeter;
+
+    @MockitoBean
+    private OperationTimings operationTimings;
+
     @Test
     @WithMockUser(username = "alice", roles = "ADMIN")
     void overview_resolvesCurrentOperatorAndServerCount() throws Exception {
         when(serverService.countServers()).thenReturn(5L);
+        when(callMeter.getFindByIdEntries()).thenReturn(2L);
+        when(operationTimings.getLastListMillis()).thenReturn(11L);
 
         mockMvc.perform(get("/api/admin/overview"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.serverCount").value(5))
-                .andExpect(jsonPath("$.requestedBy").value("alice"));
+                .andExpect(jsonPath("$.requestedBy").value("alice"))
+                .andExpect(jsonPath("$.findByIdEntries").value(2))
+                .andExpect(jsonPath("$.lastListMillis").value(11));
     }
 }
