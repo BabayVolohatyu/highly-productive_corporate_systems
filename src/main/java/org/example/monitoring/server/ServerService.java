@@ -128,7 +128,8 @@ public class ServerService {
     private void ensureUniqueHostname(String hostname, Long excludeEntityId) {
         if (stringValueRepository.existsForType(
                 ServerAttributes.ENTITY_TYPE, ServerAttributes.HOSTNAME, hostname, excludeEntityId)) {
-            throw new ConflictException("Hostname already exists");
+            // lab2-broken (AC4 demo): conflict handling disabled so unit tests fail on lab2-broken only
+            // throw new ConflictException("Hostname already exists");
         }
     }
 
