@@ -1,0 +1,314 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-create-eav-catalog
+      author: lab1
+      changes:
+        - createTable:
+            tableName: data_type
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_data_type
+              - column:
+                  name: code
+                  type: varchar(32)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_data_type_code
+        - createTable:
+            tableName: entity_type
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_entity_type
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_entity_type_code
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: attribute
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_attribute
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_attribute_code
+              - column:
+                  name: name
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: data_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_attribute_data_type
+                    references: data_type(id)
+        - createTable:
+            tableName: entity_type_attribute
+            columns:
+              - column:
+                  name: entity_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_entity_type_attribute
+                    foreignKeyName: fk_eta_entity_type
+                    references: entity_type(id)
+              - column:
+                  name: attribute_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_entity_type_attribute
+                    foreignKeyName: fk_eta_attribute
+                    references: attribute(id)
+              - column:
+                  name: required
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: unique_within_type
+                  type: boolean
+                  constraints:
+                    nullable: false
+              - column:
+                  name: sort_order
+                  type: int
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: attribute_option
+            columns:
+              - column:
+                  name: attribute_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_attribute_option
+                    foreignKeyName: fk_attribute_option_attribute
+                    references: attribute(id)
+              - column:
+                  name: id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_attribute_option
+              - column:
+                  name: code
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: label
+                  type: varchar(255)
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: attribute_option
+            columnNames: attribute_id, code
+            constraintName: uq_attribute_option_code
+        - createTable:
+            tableName: tracked_entity
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_tracked_entity
+              - column:
+                  name: entity_type_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    foreignKeyName: fk_tracked_entity_type
+                    references: entity_type(id)
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: string_value
+            columns:
+              - column:
+                  name: entity_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_string_value
+                    foreignKeyName: fk_string_value_entity
+                    references: tracked_entity(id)
+                    deleteCascade: true
+              - column:
+                  name: attribute_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_string_value
+                    foreignKeyName: fk_string_value_attribute
+                    references: attribute(id)
+              - column:
+                  name: value
+                  type: varchar(1024)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: decimal_value
+            columns:
+              - column:
+                  name: entity_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_decimal_value
+                    foreignKeyName: fk_decimal_value_entity
+                    references: tracked_entity(id)
+                    deleteCascade: true
+              - column:
+                  name: attribute_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_decimal_value
+                    foreignKeyName: fk_decimal_value_attribute
+                    references: attribute(id)
+              - column:
+                  name: value
+                  type: numeric(19, 4)
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: boolean_value
+            columns:
+              - column:
+                  name: entity_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_boolean_value
+                    foreignKeyName: fk_boolean_value_entity
+                    references: tracked_entity(id)
+                    deleteCascade: true
+              - column:
+                  name: attribute_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_boolean_value
+                    foreignKeyName: fk_boolean_value_attribute
+                    references: attribute(id)
+              - column:
+                  name: value
+                  type: boolean
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: timestamp_value
+            columns:
+              - column:
+                  name: entity_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_timestamp_value
+                    foreignKeyName: fk_timestamp_value_entity
+                    references: tracked_entity(id)
+                    deleteCascade: true
+              - column:
+                  name: attribute_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_timestamp_value
+                    foreignKeyName: fk_timestamp_value_attribute
+                    references: attribute(id)
+              - column:
+                  name: value
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false
+        - createTable:
+            tableName: option_value
+            columns:
+              - column:
+                  name: entity_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_option_value
+                    foreignKeyName: fk_option_value_entity
+                    references: tracked_entity(id)
+                    deleteCascade: true
+              - column:
+                  name: attribute_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_option_value
+                    foreignKeyName: fk_option_value_attribute
+                    references: attribute(id)
+              - column:
+                  name: option_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            constraintName: fk_option_value_option
+            baseTableName: option_value
+            baseColumnNames: attribute_id, option_id
+            referencedTableName: attribute_option
+            referencedColumnNames: attribute_id, id

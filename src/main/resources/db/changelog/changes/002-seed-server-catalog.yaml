@@ -1,0 +1,9 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-seed-server-catalog
+      author: lab1
+      changes:
+        - sqlFile:
+            path: 002-seed-server-catalog.sql
+            relativeToChangelogFile: true
+            splitStatements: false
