@@ -13,6 +13,9 @@ import org.example.monitoring.catalog.StringValue;
 import org.example.monitoring.catalog.StringValueRepository;
 import org.example.monitoring.catalog.TrackedEntity;
 import org.example.monitoring.catalog.TrackedEntityRepository;
+import org.example.monitoring.aop.CountExternalCalls;
+import org.example.monitoring.aop.MaskManagementAddress;
+import org.example.monitoring.aop.WithinBudget;
 import org.example.monitoring.catalog.ValueKey;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -50,16 +53,31 @@ public class ServerService {
         this.serverMapper = serverMapper;
     }
 
+    @WithinBudget(maxMillis = 5000)
     @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public List<ServerResponse> findAll() {
         return toResponses(entityRepository.findByEntityType_CodeOrderByIdAsc(ServerAttributes.ENTITY_TYPE));
     }
 
+    @CountExternalCalls
     @PreAuthorize("isAuthenticated()")
     @Transactional(readOnly = true)
     public ServerResponse findById(Long id) {
         return toResponses(List.of(loadServer(id))).getFirst();
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public ServerResponse findByIdUnmetered(Long id) {
+        return findById(id);
+    }
+
+    @MaskManagementAddress
+    @PreAuthorize("isAuthenticated()")
+    @Transactional(readOnly = true)
+    public ServerResponse findByIdMasked(Long id) {
+        return findById(id);
     }
 
     @PreAuthorize("isAuthenticated()")

@@ -1,5 +1,7 @@
 package org.example.monitoring.server;
 
+import org.example.monitoring.aop.CallMeter;
+import org.example.monitoring.aop.OperationTimings;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -18,6 +20,12 @@ class AdminOverviewControllerTest {
     @Mock
     private ServerService serverService;
 
+    @Mock
+    private CallMeter callMeter;
+
+    @Mock
+    private OperationTimings operationTimings;
+
     @InjectMocks
     private AdminOverviewController controller;
 
@@ -25,6 +33,8 @@ class AdminOverviewControllerTest {
     void overview_returnsServerCountFromService() {
         // Arrange
         when(serverService.countServers()).thenReturn(7L);
+        when(callMeter.getFindByIdEntries()).thenReturn(3L);
+        when(operationTimings.getLastListMillis()).thenReturn(42L);
 
         // Act
         Map<String, Object> result = controller.overview("alice");
@@ -32,6 +42,8 @@ class AdminOverviewControllerTest {
         // Assert
         assertThat(result).containsEntry("serverCount", 7L);
         assertThat(result).containsEntry("requestedBy", "alice");
+        assertThat(result).containsEntry("findByIdEntries", 3L);
+        assertThat(result).containsEntry("lastListMillis", 42L);
         verify(serverService).countServers();
     }
 }

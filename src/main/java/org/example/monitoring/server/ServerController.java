@@ -34,6 +34,16 @@ public class ServerController {
         return serverService.findById(id);
     }
 
+    @GetMapping("/{id}/unmetered")
+    public ServerResponse getUnmetered(@PathVariable Long id) {
+        return serverService.findByIdUnmetered(id);
+    }
+
+    @GetMapping("/{id}/masked")
+    public ServerResponse getMasked(@PathVariable Long id) {
+        return serverService.findByIdMasked(id);
+    }
+
     @CreateServer
     public ServerResponse create(@Valid @RequestBody ServerRequest request) {
         return serverService.create(request);

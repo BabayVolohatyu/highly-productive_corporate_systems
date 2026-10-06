@@ -95,3 +95,25 @@ Run unit and slice tests without Testcontainers:
 ```text
 mvnw.cmd test -Dtest=!*ApiSecurityTest
 ```
+
+## Lab 4: aspect-oriented programming
+
+Work on branch **`lab4`**. The 3NF EAV catalog is unchanged (no Liquibase or schema edits).
+
+Three annotations, three aspects:
+
+| Annotation | Advice | Role |
+| --- | --- | --- |
+| `@CountExternalCalls` | `@Before` | Counts proxied `ServerService.findById` calls in `CallMeter` |
+| `@WithinBudget(maxMillis)` | `@Around` | Times `findAll`; over-budget work throws `BudgetExceededException` (503) |
+| `@MaskManagementAddress` | `@Around` | Masks the last IPv4 octet on `GET /api/servers/{id}/masked` only |
+
+Self-invocation demo: `GET /api/servers/{id}/unmetered` calls `findById` inside the same class, so the counter does not move. `GET /api/servers/{id}` hits the proxy and increments the counter. Admin overview exposes `findByIdEntries` and `lastListMillis`.
+
+Postman: after **AC1 update server**, run the **Lab4** requests (baseline overview, proxied get, unmetered get, masked get) before the remaining AC6/AC7 steps.
+
+Run unit and slice tests without Testcontainers:
+
+```text
+mvnw.cmd test -Dtest=!*ApiSecurityTest
+```

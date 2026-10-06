@@ -51,6 +51,28 @@ class ServerControllerTest {
     }
 
     @Test
+    void getUnmetered_delegatesToService() {
+        ServerResponse row = sampleResponse(8L);
+        when(serverService.findByIdUnmetered(8L)).thenReturn(row);
+
+        ServerResponse result = controller.getUnmetered(8L);
+
+        assertThat(result).isEqualTo(row);
+        verify(serverService).findByIdUnmetered(8L);
+    }
+
+    @Test
+    void getMasked_delegatesToService() {
+        ServerResponse row = sampleResponse(9L);
+        when(serverService.findByIdMasked(9L)).thenReturn(row);
+
+        ServerResponse result = controller.getMasked(9L);
+
+        assertThat(result).isEqualTo(row);
+        verify(serverService).findByIdMasked(9L);
+    }
+
+    @Test
     void create_delegatesToService() {
         // Arrange
         ServerRequest request = new ServerRequest("h", "1.1.1.1", "DEV", "UP", "");

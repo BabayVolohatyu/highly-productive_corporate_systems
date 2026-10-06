@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Server monitoring lab 1",
-    "description": "CRUD, JWT, SecurityFilterChain 403, @PreAuthorize 403, Lab 3 validation and @CurrentOperator overview.",
+    "description": "CRUD, JWT, SecurityFilterChain 403, @PreAuthorize 403, Lab 3 validation and @CurrentOperator overview, Lab 4 AOP metering, budget timing, and masked GET.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -10,7 +10,8 @@
     {"key": "apiClientSecret", "value": "monitoring-api-secret"},
     {"key": "adminToken", "value": ""},
     {"key": "operatorToken", "value": ""},
-    {"key": "serverId", "value": ""}
+    {"key": "serverId", "value": ""},
+    {"key": "lab4FindByIdBaseline", "value": "0"}
   ],
   "item": [
     {
@@ -208,6 +209,165 @@
           "raw": "{\n  \"hostname\": \"edge-1\",\n  \"ipAddress\": \"10.0.0.16\",\n  \"environment\": \"STAGE\",\n  \"status\": \"MAINTENANCE\",\n  \"description\": \"patched\"\n}"
         },
         "url": "{{baseUrl}}/api/servers/{{serverId}}"
+      }
+    },
+    {
+      "name": "Lab4 overview baseline findByIdEntries",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "pm.collectionVariables.set('lab4FindByIdBaseline', String(pm.response.json().findByIdEntries));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/admin/overview"
+      }
+    },
+    {
+      "name": "Lab4 GET server via proxy counts findById",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "pm.test('hostname unchanged', function () {",
+              "  pm.expect(pm.response.json().hostname).to.eql('edge-1');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/servers/{{serverId}}"
+      }
+    },
+    {
+      "name": "Lab4 overview after proxy get",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "const baseline = parseInt(pm.collectionVariables.get('lab4FindByIdBaseline'), 10);",
+              "const body = pm.response.json();",
+              "pm.test('findById counter increased by one', function () {",
+              "  pm.expect(body.findByIdEntries).to.eql(baseline + 1);",
+              "});",
+              "pm.test('lastListMillis recorded from list', function () {",
+              "  pm.expect(body.lastListMillis).to.be.at.least(0);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/admin/overview"
+      }
+    },
+    {
+      "name": "Lab4 GET unmetered self-invocation",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "pm.test('same hostname as proxied get', function () {",
+              "  pm.expect(pm.response.json().hostname).to.eql('edge-1');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/servers/{{serverId}}/unmetered"
+      }
+    },
+    {
+      "name": "Lab4 overview after unmetered get",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "const baseline = parseInt(pm.collectionVariables.get('lab4FindByIdBaseline'), 10);",
+              "pm.test('findById counter unchanged by self-invocation', function () {",
+              "  pm.expect(pm.response.json().findByIdEntries).to.eql(baseline + 1);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/admin/overview"
+      }
+    },
+    {
+      "name": "Lab4 GET masked management address",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "const body = pm.response.json();",
+              "pm.test('hostname unchanged', function () { pm.expect(body.hostname).to.eql('edge-1'); });",
+              "pm.test('ipAddress masked in response only', function () { pm.expect(body.ipAddress).to.eql('10.0.0.***'); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/servers/{{serverId}}/masked"
+      }
+    },
+    {
+      "name": "Lab4 overview after masked get",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "const baseline = parseInt(pm.collectionVariables.get('lab4FindByIdBaseline'), 10);",
+              "pm.test('findById counter still unchanged', function () {",
+              "  pm.expect(pm.response.json().findByIdEntries).to.eql(baseline + 1);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/admin/overview"
       }
     },
     {
