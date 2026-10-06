@@ -32,10 +32,13 @@ public class ApiExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> validation(MethodArgumentNotValidException exception) {
-        String message = exception.getBindingResult().getFieldErrors().stream()
-                .map(error -> error.getField() + " " + error.getDefaultMessage())
+        String message = exception.getBindingResult().getGlobalErrors().stream()
+                .map(error -> error.getDefaultMessage())
                 .findFirst()
-                .orElse("Request is invalid");
+                .orElseGet(() -> exception.getBindingResult().getFieldErrors().stream()
+                        .map(error -> error.getField() + " " + error.getDefaultMessage())
+                        .findFirst()
+                        .orElse("Request is invalid"));
         return Map.of("error", message);
     }
 }

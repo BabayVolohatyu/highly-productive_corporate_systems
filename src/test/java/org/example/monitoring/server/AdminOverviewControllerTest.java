@@ -27,10 +27,11 @@ class AdminOverviewControllerTest {
         when(serverService.countServers()).thenReturn(7L);
 
         // Act
-        Map<String, Long> result = controller.overview();
+        Map<String, Object> result = controller.overview("alice");
 
         // Assert
         assertThat(result).containsEntry("serverCount", 7L);
+        assertThat(result).containsEntry("requestedBy", "alice");
         verify(serverService).countServers();
     }
 }

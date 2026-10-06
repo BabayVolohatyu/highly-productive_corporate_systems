@@ -3,6 +3,7 @@ package org.example.monitoring.server;
 import org.junit.jupiter.api.Test;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.List;
@@ -49,6 +50,7 @@ class ApiExceptionHandlerTest {
         MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = mock(BindingResult.class);
         when(exception.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.getGlobalErrors()).thenReturn(List.of());
         when(bindingResult.getFieldErrors()).thenReturn(List.of(
                 new FieldError("serverRequest", "hostname", "must not be blank")));
 
@@ -60,11 +62,30 @@ class ApiExceptionHandlerTest {
     }
 
     @Test
+    void validation_globalError_returnsGlobalMessage() {
+        // Arrange
+        MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
+        BindingResult bindingResult = mock(BindingResult.class);
+        when(exception.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.getGlobalErrors()).thenReturn(List.of(
+                new ObjectError("serverRequest", "A production server cannot have status UNKNOWN. Use UP, DOWN, or MAINTENANCE.")));
+        when(bindingResult.getFieldErrors()).thenReturn(List.of());
+
+        // Act
+        Map<String, String> body = handler.validation(exception);
+
+        // Assert
+        assertThat(body.get("error")).containsIgnoringCase("production");
+        assertThat(body.get("error")).containsIgnoringCase("UNKNOWN");
+    }
+
+    @Test
     void validation_noFieldErrors_returnsGenericMessage() {
         // Arrange
         MethodArgumentNotValidException exception = mock(MethodArgumentNotValidException.class);
         BindingResult bindingResult = mock(BindingResult.class);
         when(exception.getBindingResult()).thenReturn(bindingResult);
+        when(bindingResult.getGlobalErrors()).thenReturn(List.of());
         when(bindingResult.getFieldErrors()).thenReturn(List.of());
 
         // Act

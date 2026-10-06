@@ -1,11 +1,11 @@
 package org.example.monitoring.server;
 
 import jakarta.validation.Valid;
+import org.example.monitoring.web.CreateServer;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,8 +34,7 @@ public class ServerController {
         return serverService.findById(id);
     }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
+    @CreateServer
     public ServerResponse create(@Valid @RequestBody ServerRequest request) {
         return serverService.create(request);
     }

@@ -75,3 +75,23 @@ For **AC4** at defense, compare **`lab2`** (submitted work) with **`lab2-broken`
 ```text
 git diff lab2..lab2-broken -- src/main/java/org/example/monitoring/server/ServerService.java
 ```
+
+## Lab 3: custom annotations
+
+Work on branch **`lab3`**. The 3NF EAV catalog is unchanged (no Liquibase or schema edits).
+
+Three annotations, three mechanisms:
+
+| Annotation | Type | Role |
+| --- | --- | --- |
+| `@ConsistentProductionStatus` | Bean Validation constraint | Class-level rule on `ServerRequest`: PROD servers cannot have status UNKNOWN |
+| `@CreateServer` | Composed (meta-)annotation | Replaces `@RequestMapping(POST)` + `@ResponseStatus(CREATED)` on server create |
+| `@CurrentOperator` | MVC argument resolver | Injects JWT `preferred_username` into `GET /api/admin/overview` as `requestedBy` |
+
+Postman (same collection as Lab 1): after auth, **Lab3 PROD with UNKNOWN status is 400** proves the constraint; **AC6 admin overview allowed** also checks `requestedBy` is `alice`.
+
+Run unit and slice tests without Testcontainers:
+
+```text
+mvnw.cmd test -Dtest=!*ApiSecurityTest
+```

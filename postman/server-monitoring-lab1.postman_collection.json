@@ -1,7 +1,7 @@
 {
   "info": {
     "name": "Server monitoring lab 1",
-    "description": "CRUD, JWT, SecurityFilterChain 403, and @PreAuthorize 403 for the lab defense.",
+    "description": "CRUD, JWT, SecurityFilterChain 403, @PreAuthorize 403, Lab 3 validation and @CurrentOperator overview.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -75,6 +75,37 @@
           ]
         },
         "url": "{{keycloakUrl}}/realms/monitoring/protocol/openid-connect/token"
+      }
+    },
+    {
+      "name": "Lab3 PROD with UNKNOWN status is 400",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('400 validation', function () { pm.response.to.have.status(400); });",
+              "const body = pm.response.json();",
+              "pm.test('message mentions production and UNKNOWN', function () {",
+              "  pm.expect(body.error).to.match(/production/i);",
+              "  pm.expect(body.error).to.match(/UNKNOWN/i);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{adminToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hostname\": \"bad-prod-host\",\n  \"ipAddress\": \"10.0.0.99\",\n  \"environment\": \"PROD\",\n  \"status\": \"UNKNOWN\",\n  \"description\": \"\"\n}"
+        },
+        "url": "{{baseUrl}}/api/servers"
       }
     },
     {
@@ -203,7 +234,12 @@
           "listen": "test",
           "script": {
             "type": "text/javascript",
-            "exec": ["pm.test('200', function () { pm.response.to.have.status(200); });"]
+            "exec": [
+              "pm.test('200', function () { pm.response.to.have.status(200); });",
+              "pm.test('requestedBy is alice', function () {",
+              "  pm.expect(pm.response.json().requestedBy).to.eql('alice');",
+              "});"
+            ]
           }
         }
       ],

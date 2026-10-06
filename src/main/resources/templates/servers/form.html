@@ -16,6 +16,7 @@
     <form class="form"
           th:action="${editing} ? @{/servers/{id}(id=${serverId})} : @{/servers}"
           th:object="${server}" method="post">
+        <p class="error" th:each="globalErr : ${#fields.globalErrors()}" th:text="${globalErr}">Global error</p>
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
         <label>Hostname
             <input type="text" th:field="*{hostname}" required>
