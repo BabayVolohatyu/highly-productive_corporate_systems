@@ -49,3 +49,23 @@ Import `postman/server-monitoring-lab1.postman_collection.json` and run the fold
 - Bob calling `GET /api/admin/overview` returns 403 from the security filter chain.
 - Bob calling `DELETE /api/servers/{id}` returns 403 from `@PreAuthorize` on `ServerService.delete`. The filter chain allows any authenticated caller on that path.
 - Alice calling both of those endpoints succeeds.
+
+## Lab 2: unit tests and coverage
+
+Unit tests use Mockito only (no Spring context, database, or network). Run them without the Lab 1 integration test:
+
+```text
+mvnw.cmd test -Dtest=!*ApiSecurityTest
+```
+
+Open the JaCoCo HTML report after tests:
+
+```text
+target\site\jacoco\index.html
+```
+
+Enforce the 60% instruction coverage gate (includes `ApiSecurityTest` if you run the full suite):
+
+```text
+mvnw.cmd verify
+```

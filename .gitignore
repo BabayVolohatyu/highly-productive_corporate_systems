@@ -41,3 +41,4 @@ build/
 ### Local lab files ###
 .env
 lab_plans/
+presentation_plans/
