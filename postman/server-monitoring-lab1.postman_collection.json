@@ -1,0 +1,251 @@
+{
+  "info": {
+    "name": "Server monitoring lab 1",
+    "description": "CRUD, JWT, SecurityFilterChain 403, and @PreAuthorize 403 for the lab defense.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {"key": "baseUrl", "value": "http://localhost:8080"},
+    {"key": "keycloakUrl", "value": "http://localhost:8081"},
+    {"key": "apiClientSecret", "value": "monitoring-api-secret"},
+    {"key": "adminToken", "value": ""},
+    {"key": "operatorToken", "value": ""},
+    {"key": "serverId", "value": ""}
+  ],
+  "item": [
+    {
+      "name": "Auth - admin token (alice)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('admin token issued', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.collectionVariables.set('adminToken', pm.response.json().access_token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {"key": "grant_type", "value": "password"},
+            {"key": "client_id", "value": "monitoring-api"},
+            {"key": "client_secret", "value": "{{apiClientSecret}}"},
+            {"key": "username", "value": "alice"},
+            {"key": "password", "value": "alice"}
+          ]
+        },
+        "url": "{{keycloakUrl}}/realms/monitoring/protocol/openid-connect/token"
+      }
+    },
+    {
+      "name": "Auth - operator token (bob)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('operator token issued', function () {",
+              "  pm.response.to.have.status(200);",
+              "  pm.collectionVariables.set('operatorToken', pm.response.json().access_token);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [{"key": "Content-Type", "value": "application/x-www-form-urlencoded"}],
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            {"key": "grant_type", "value": "password"},
+            {"key": "client_id", "value": "monitoring-api"},
+            {"key": "client_secret", "value": "{{apiClientSecret}}"},
+            {"key": "username", "value": "bob"},
+            {"key": "password", "value": "bob"}
+          ]
+        },
+        "url": "{{keycloakUrl}}/realms/monitoring/protocol/openid-connect/token"
+      }
+    },
+    {
+      "name": "AC5 missing token is 401",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('401', function () { pm.response.to.have.status(401); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/api/servers"
+      }
+    },
+    {
+      "name": "AC1 create server",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('201', function () { pm.response.to.have.status(201); });",
+              "pm.collectionVariables.set('serverId', pm.response.json().id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{adminToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hostname\": \"edge-1\",\n  \"ipAddress\": \"10.0.0.15\",\n  \"environment\": \"PROD\",\n  \"status\": \"UP\",\n  \"description\": \"edge proxy\"\n}"
+        },
+        "url": "{{baseUrl}}/api/servers"
+      }
+    },
+    {
+      "name": "AC1 list servers",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('200', function () { pm.response.to.have.status(200); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/servers"
+      }
+    },
+    {
+      "name": "AC1 get server",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('200', function () { pm.response.to.have.status(200); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/servers/{{serverId}}"
+      }
+    },
+    {
+      "name": "AC1 update server",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('200', function () { pm.response.to.have.status(200); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [
+          {"key": "Authorization", "value": "Bearer {{adminToken}}"},
+          {"key": "Content-Type", "value": "application/json"}
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hostname\": \"edge-1\",\n  \"ipAddress\": \"10.0.0.16\",\n  \"environment\": \"STAGE\",\n  \"status\": \"MAINTENANCE\",\n  \"description\": \"patched\"\n}"
+        },
+        "url": "{{baseUrl}}/api/servers/{{serverId}}"
+      }
+    },
+    {
+      "name": "AC6 operator forbidden on admin path",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('403 from SecurityFilterChain', function () { pm.response.to.have.status(403); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{operatorToken}}"}],
+        "url": "{{baseUrl}}/api/admin/overview"
+      }
+    },
+    {
+      "name": "AC6 admin overview allowed",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('200', function () { pm.response.to.have.status(200); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/admin/overview"
+      }
+    },
+    {
+      "name": "AC7 operator forbidden on delete",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('403 from PreAuthorize', function () { pm.response.to.have.status(403); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [{"key": "Authorization", "value": "Bearer {{operatorToken}}"}],
+        "url": "{{baseUrl}}/api/servers/{{serverId}}"
+      }
+    },
+    {
+      "name": "AC1 admin delete server",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": ["pm.test('204', function () { pm.response.to.have.status(204); });"]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [{"key": "Authorization", "value": "Bearer {{adminToken}}"}],
+        "url": "{{baseUrl}}/api/servers/{{serverId}}"
+      }
+    }
+  ]
+}

@@ -1,0 +1,167 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: "Segoe UI", sans-serif;
+    line-height: 1.45;
+}
+
+a {
+    color: var(--color-primary);
+}
+
+.topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.85rem 1.5rem;
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+}
+
+.brand {
+    color: var(--color-on-primary);
+    font-weight: 650;
+    text-decoration: none;
+    letter-spacing: 0.01em;
+}
+
+.topbar form {
+    margin: 0;
+}
+
+.topbar button,
+.topbar button.secondary {
+    background: transparent;
+    color: var(--color-on-primary);
+    border-color: var(--color-on-primary);
+}
+
+.page {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.75rem 1.5rem 3rem;
+}
+
+h1 {
+    margin: 0 0 1rem;
+    font-size: 1.6rem;
+    font-weight: 650;
+}
+
+.meta,
+.message,
+.error {
+    margin: 0 0 1rem;
+}
+
+.meta {
+    color: var(--color-muted);
+}
+
+.message,
+.error {
+    padding: 0.65rem 0.8rem;
+    background: var(--color-surface);
+    border-left: 3px solid var(--color-primary);
+}
+
+.actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.button,
+button,
+.actions a,
+.row-actions a {
+    display: inline-block;
+    padding: 0.4rem 0.75rem;
+    border: 1px solid var(--color-primary);
+    background: var(--color-primary);
+    color: var(--color-on-primary);
+    text-decoration: none;
+    font: inherit;
+    cursor: pointer;
+}
+
+.button.secondary,
+button.secondary,
+.row-actions a,
+.actions a.secondary {
+    background: transparent;
+    color: var(--color-primary);
+}
+
+button.danger {
+    background: transparent;
+    color: var(--color-primary);
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: var(--color-surface);
+}
+
+th,
+td {
+    padding: 0.55rem 0.7rem;
+    border-bottom: 1px solid var(--color-border);
+    text-align: left;
+    vertical-align: middle;
+}
+
+th {
+    font-weight: 650;
+}
+
+.row-actions {
+    display: flex;
+    gap: 0.4rem;
+    align-items: center;
+}
+
+.row-actions form {
+    margin: 0;
+}
+
+.form {
+    display: grid;
+    gap: 0.9rem;
+    max-width: 28rem;
+}
+
+label {
+    display: grid;
+    gap: 0.3rem;
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid var(--color-border);
+    background: var(--color-surface);
+    color: var(--color-text);
+    font: inherit;
+}
+
+textarea {
+    min-height: 6rem;
+    resize: vertical;
+}
+
+.field-error {
+    color: var(--color-primary);
+    font-size: 0.9rem;
+}

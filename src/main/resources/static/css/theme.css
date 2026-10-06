@@ -1,0 +1,12 @@
+:root {
+    /* Reassign these two variables to retheme the whole UI. */
+    --color-primary: #001a4b;
+    --color-accent: #dccdb7;
+
+    --color-text: var(--color-primary);
+    --color-bg: var(--color-accent);
+    --color-surface: color-mix(in srgb, var(--color-accent) 55%, white);
+    --color-border: color-mix(in srgb, var(--color-primary) 22%, var(--color-accent));
+    --color-muted: color-mix(in srgb, var(--color-primary) 58%, var(--color-accent));
+    --color-on-primary: var(--color-accent);
+}

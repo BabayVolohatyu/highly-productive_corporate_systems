@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Server monitoring</title>
+    <link rel="stylesheet" href="/css/theme.css">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+<header class="topbar">
+    <a class="brand" href="/">Server monitoring</a>
+</header>
+<main class="page">
+    <h1>Server monitoring</h1>
+    <p class="actions" th:if="${anonymous}">
+        <a href="/oauth2/authorization/keycloak">Log in with Keycloak</a>
+    </p>
+    <p class="meta" th:unless="${anonymous}">
+        Signed in as <span th:text="${username}">user</span>
+        (<span th:text="${roles}">roles</span>).
+    </p>
+    <p class="actions" th:unless="${anonymous}">
+        <a href="/servers">Open servers</a>
+    </p>
+</main>
+</body>
+</html>
