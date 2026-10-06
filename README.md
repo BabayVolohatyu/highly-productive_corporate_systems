@@ -69,3 +69,9 @@ Enforce the 60% instruction coverage gate (includes `ApiSecurityTest` if you run
 ```text
 mvnw.cmd verify
 ```
+
+For **AC4** at defense, compare **`lab2`** (submitted work) with **`lab2-broken`** (intentionally broken hostname uniqueness):
+
+```text
+git diff lab2..lab2-broken -- src/main/java/org/example/monitoring/server/ServerService.java
+```
