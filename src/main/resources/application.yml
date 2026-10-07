@@ -28,8 +28,11 @@ spring:
             redirect-uri: "{baseUrl}/login/oauth2/code/{registrationId}"
         provider:
           keycloak:
-            issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/monitoring}
+            authorization-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/monitoring}/protocol/openid-connect/auth
+            token-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/monitoring}/protocol/openid-connect/token
+            user-info-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/monitoring}/protocol/openid-connect/userinfo
+            jwk-set-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/monitoring}/protocol/openid-connect/certs
             user-name-attribute: preferred_username
       resourceserver:
         jwt:
-          issuer-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/monitoring}
+          jwk-set-uri: ${KEYCLOAK_ISSUER_URI:http://localhost:8081/realms/monitoring}/protocol/openid-connect/certs
