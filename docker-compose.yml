@@ -30,6 +30,12 @@ services:
     volumes:
       - ./keycloak/realm-monitoring.json:/opt/keycloak/data/import/realm-monitoring.json:ro
 
+  rabbitmq:
+    image: rabbitmq:4-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
   server-service:
     build:
       context: .
@@ -45,10 +51,14 @@ services:
       KEYCLOAK_PUBLIC_ISSUER: http://localhost:8081/realms/monitoring
       KEYCLOAK_INTERNAL_ISSUER: http://keycloak:8080/realms/monitoring
       KEYCLOAK_API_CLIENT_SECRET: ${KEYCLOAK_API_CLIENT_SECRET:-monitoring-api-secret}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
     depends_on:
       postgres:
         condition: service_healthy
       keycloak:
+        condition: service_started
+      rabbitmq:
         condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/ -o /dev/null"]
@@ -69,9 +79,13 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-monitoring}
       POSTGRES_USER: ${POSTGRES_USER:-monitoring}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-monitoring}
+      RABBITMQ_HOST: rabbitmq
+      RABBITMQ_PORT: 5672
     depends_on:
       postgres:
         condition: service_healthy
+      rabbitmq:
+        condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8082/api/notifications -o /dev/null"]
       interval: 10s

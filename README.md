@@ -139,3 +139,7 @@ Work on branch **`lab7`**. The root `pom.xml` has `<packaging>pom</packaging>` a
 docker compose up --build -d
 mvnw.cmd verify -Dtest=!*ApiSecurityTest
 ```
+
+## Lab 8: message broker
+
+Work on branch **`lab8`**. RabbitMQ is a service in `docker-compose.yml`. Creating a server, updating a server, and `POST /api/servers/{id}/reports` each write one outbox row in the same transaction. `OutboxDispatcher` publishes that row to the durable queue `catalog.events` only after commit. `notification-service` does not call `server-service` over HTTP and does not use its classes. It reads `CatalogEvent` from `common`, stores a row, and shows it at `GET http://localhost:8082/api/notifications`. The same `eventId` does not create a second row. `RABBITMQ_HOST` is `rabbitmq` in Compose and defaults to `localhost` for the IDE.

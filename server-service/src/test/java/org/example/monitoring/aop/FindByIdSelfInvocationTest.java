@@ -1,6 +1,7 @@
 package org.example.monitoring.aop;
 
 import org.example.monitoring.asyncwork.OperatorNotifier;
+import org.example.monitoring.messaging.CatalogEventPublisher;
 import org.example.monitoring.catalog.AttributeDefinition;
 import org.example.monitoring.catalog.AttributeOptionRepository;
 import org.example.monitoring.catalog.DataType;
@@ -230,6 +231,11 @@ class FindByIdSelfInvocationTest {
         }
 
         @Bean
+        CatalogEventPublisher catalogEventPublisher() {
+            return mock(CatalogEventPublisher.class);
+        }
+
+        @Bean
         ServerService serverService(EntityTypeRepository entityTypeRepository,
                                     EntityTypeAttributeRepository linkRepository,
                                     TrackedEntityRepository entityRepository,
@@ -237,7 +243,8 @@ class FindByIdSelfInvocationTest {
                                     OptionValueRepository optionValueRepository,
                                     AttributeOptionRepository optionRepository,
                                     ServerMapper serverMapper,
-                                    OperatorNotifier operatorNotifier) {
+                                    OperatorNotifier operatorNotifier,
+                                    CatalogEventPublisher catalogEventPublisher) {
             return new ServerService(
                     entityTypeRepository,
                     linkRepository,
@@ -246,7 +253,8 @@ class FindByIdSelfInvocationTest {
                     optionValueRepository,
                     optionRepository,
                     serverMapper,
-                    operatorNotifier);
+                    operatorNotifier,
+                    catalogEventPublisher);
         }
     }
 

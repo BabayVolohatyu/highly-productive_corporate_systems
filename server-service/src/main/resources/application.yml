@@ -14,6 +14,9 @@ spring:
       hibernate.jdbc.time_zone: UTC
   liquibase:
     change-log: classpath:db/changelog/db.changelog-master.yaml
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
   quartz:
     job-store-type: jdbc
     jdbc:

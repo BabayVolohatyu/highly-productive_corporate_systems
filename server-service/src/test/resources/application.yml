@@ -3,3 +3,5 @@ spring:
     exclude:
       - org.springframework.boot.quartz.autoconfigure.QuartzAutoConfiguration
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
+      - org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration
+      - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration

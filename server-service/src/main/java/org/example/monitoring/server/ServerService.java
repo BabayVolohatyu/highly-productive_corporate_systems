@@ -16,7 +16,9 @@ import org.example.monitoring.catalog.TrackedEntityRepository;
 import org.example.monitoring.aop.CountExternalCalls;
 import org.example.monitoring.aop.MaskManagementAddress;
 import org.example.monitoring.aop.WithinBudget;
+import org.example.common.CatalogEvents;
 import org.example.monitoring.asyncwork.OperatorNotifier;
+import org.example.monitoring.messaging.CatalogEventPublisher;
 import org.example.monitoring.catalog.ValueKey;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -38,6 +40,7 @@ public class ServerService {
     private final AttributeOptionRepository optionRepository;
     private final ServerMapper serverMapper;
     private final OperatorNotifier operatorNotifier;
+    private final CatalogEventPublisher catalogEventPublisher;
 
     public ServerService(EntityTypeRepository entityTypeRepository,
                          EntityTypeAttributeRepository linkRepository,
@@ -46,7 +49,8 @@ public class ServerService {
                          OptionValueRepository optionValueRepository,
                          AttributeOptionRepository optionRepository,
                          ServerMapper serverMapper,
-                         OperatorNotifier operatorNotifier) {
+                         OperatorNotifier operatorNotifier,
+                         CatalogEventPublisher catalogEventPublisher) {
         this.entityTypeRepository = entityTypeRepository;
         this.linkRepository = linkRepository;
         this.entityRepository = entityRepository;
@@ -55,6 +59,7 @@ public class ServerService {
         this.optionRepository = optionRepository;
         this.serverMapper = serverMapper;
         this.operatorNotifier = operatorNotifier;
+        this.catalogEventPublisher = catalogEventPublisher;
     }
 
     @WithinBudget(maxMillis = 5000)
@@ -115,6 +120,7 @@ public class ServerService {
         writeValues(entity, request, links);
         ServerResponse response = toResponses(List.of(entity)).getFirst();
         operatorNotifier.notifyServerRegistered(response.hostname());
+        catalogEventPublisher.stage(CatalogEvents.SERVER_REGISTERED, response.id(), response.hostname(), response.status());
         return response;
     }
 
@@ -126,7 +132,9 @@ public class ServerService {
         ensureUniqueHostname(hostname, id);
         entity.setUpdatedAt(Instant.now());
         writeValues(entity, request, links());
-        return toResponses(List.of(entityRepository.save(entity))).getFirst();
+        ServerResponse response = toResponses(List.of(entityRepository.save(entity))).getFirst();
+        catalogEventPublisher.stage(CatalogEvents.SERVER_STATUS_CHANGED, response.id(), response.hostname(), response.status());
+        return response;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -134,6 +142,14 @@ public class ServerService {
     public void delete(Long id) {
         TrackedEntity entity = loadServer(id);
         entityRepository.delete(entity);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")
+    @Transactional
+    public ServerResponse requestReport(Long id) {
+        ServerResponse response = findById(id);
+        catalogEventPublisher.stage(CatalogEvents.REPORT_REQUESTED, response.id(), response.hostname(), response.status());
+        return response;
     }
 
     private List<EntityTypeAttribute> links() {
