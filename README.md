@@ -10,14 +10,13 @@ JDK 27 is required. Point `JAVA_HOME` at it if `java` is not on your PATH:
 JAVA_HOME=C:\Users\babay\.jdks\openjdk-27
 ```
 
-From the project root:
+From the project root, one command builds the app image and starts PostgreSQL, Keycloak, and the application:
 
 ```text
-docker compose up -d
-mvnw.cmd spring-boot:run
+docker compose up --build -d
 ```
 
-The app reads `.env`. Copy `.env.example` if you do not have one yet. PostgreSQL is published on port 5432. Keycloak is on http://localhost:8081. The app is on http://localhost:8080.
+PostgreSQL is published on port 5432. Keycloak is on http://localhost:8081. The app is on http://localhost:8080. Inside the app container, the database host is `postgres` and Keycloak's token and certificate URLs use `http://keycloak:8080`. The browser still signs in at `http://localhost:8081`. Copy `.env.example` to `.env` only when you run the jar from the IDE.
 
 Open http://localhost:8080 and choose **Log in with Keycloak**.
 
