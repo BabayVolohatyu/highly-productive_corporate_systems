@@ -1,5 +1,6 @@
 package org.example.monitoring.aop;
 
+import org.example.monitoring.asyncwork.OperatorNotifier;
 import org.example.monitoring.catalog.AttributeDefinition;
 import org.example.monitoring.catalog.AttributeOptionRepository;
 import org.example.monitoring.catalog.DataType;
@@ -224,13 +225,19 @@ class FindByIdSelfInvocationTest {
         }
 
         @Bean
+        OperatorNotifier operatorNotifier() {
+            return mock(OperatorNotifier.class);
+        }
+
+        @Bean
         ServerService serverService(EntityTypeRepository entityTypeRepository,
                                     EntityTypeAttributeRepository linkRepository,
                                     TrackedEntityRepository entityRepository,
                                     StringValueRepository stringValueRepository,
                                     OptionValueRepository optionValueRepository,
                                     AttributeOptionRepository optionRepository,
-                                    ServerMapper serverMapper) {
+                                    ServerMapper serverMapper,
+                                    OperatorNotifier operatorNotifier) {
             return new ServerService(
                     entityTypeRepository,
                     linkRepository,
@@ -238,7 +245,8 @@ class FindByIdSelfInvocationTest {
                     stringValueRepository,
                     optionValueRepository,
                     optionRepository,
-                    serverMapper);
+                    serverMapper,
+                    operatorNotifier);
         }
     }
 

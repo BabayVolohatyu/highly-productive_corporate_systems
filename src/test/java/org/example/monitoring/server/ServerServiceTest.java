@@ -14,6 +14,7 @@ import org.example.monitoring.catalog.OptionValueRepository;
 import org.example.monitoring.catalog.StringValue;
 import org.example.monitoring.catalog.StringValueRepository;
 import org.example.monitoring.catalog.TrackedEntity;
+import org.example.monitoring.asyncwork.OperatorNotifier;
 import org.example.monitoring.catalog.ValueKey;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -58,6 +59,8 @@ class ServerServiceTest {
     private AttributeOptionRepository optionRepository;
     @Mock
     private ServerMapper serverMapper;
+    @Mock
+    private OperatorNotifier operatorNotifier;
 
     @InjectMocks
     private ServerService serverService;

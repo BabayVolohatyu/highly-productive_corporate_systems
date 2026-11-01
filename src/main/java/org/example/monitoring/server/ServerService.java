@@ -16,6 +16,7 @@ import org.example.monitoring.catalog.TrackedEntityRepository;
 import org.example.monitoring.aop.CountExternalCalls;
 import org.example.monitoring.aop.MaskManagementAddress;
 import org.example.monitoring.aop.WithinBudget;
+import org.example.monitoring.asyncwork.OperatorNotifier;
 import org.example.monitoring.catalog.ValueKey;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -36,6 +37,7 @@ public class ServerService {
     private final OptionValueRepository optionValueRepository;
     private final AttributeOptionRepository optionRepository;
     private final ServerMapper serverMapper;
+    private final OperatorNotifier operatorNotifier;
 
     public ServerService(EntityTypeRepository entityTypeRepository,
                          EntityTypeAttributeRepository linkRepository,
@@ -43,7 +45,8 @@ public class ServerService {
                          StringValueRepository stringValueRepository,
                          OptionValueRepository optionValueRepository,
                          AttributeOptionRepository optionRepository,
-                         ServerMapper serverMapper) {
+                         ServerMapper serverMapper,
+                         OperatorNotifier operatorNotifier) {
         this.entityTypeRepository = entityTypeRepository;
         this.linkRepository = linkRepository;
         this.entityRepository = entityRepository;
@@ -51,6 +54,7 @@ public class ServerService {
         this.optionValueRepository = optionValueRepository;
         this.optionRepository = optionRepository;
         this.serverMapper = serverMapper;
+        this.operatorNotifier = operatorNotifier;
     }
 
     @WithinBudget(maxMillis = 5000)
@@ -109,7 +113,9 @@ public class ServerService {
         entity.setUpdatedAt(now);
         entity = entityRepository.save(entity);
         writeValues(entity, request, links);
-        return toResponses(List.of(entity)).getFirst();
+        ServerResponse response = toResponses(List.of(entity)).getFirst();
+        operatorNotifier.notifyServerRegistered(response.hostname());
+        return response;
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','OPERATOR')")

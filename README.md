@@ -116,3 +116,11 @@ Run unit and slice tests without Testcontainers:
 ```text
 mvnw.cmd test -Dtest=!*ApiSecurityTest
 ```
+
+## Lab 5: asynchronous work
+
+Work on branch **`lab5`**. Creating a server returns as soon as the row is saved. `OperatorNotifier.notifyServerRegistered` then sends mail on the `monitoringExecutor` pool (`monitoring-async-` threads, core 2, max 4, queue 20). `GET /api/admin/mail` shows the hostname after that work finishes.
+
+`GET /api/servers/{id}/health` starts a reachability probe and a certificate lookup together, both returning `CompletableFuture`, and combines them with `thenCombine`. A failed lookup becomes `UNAVAILABLE` instead of failing the request. The wait is capped at 2 seconds.
+
+`POST /api/servers/{id}/maintenance` uses a pool of one thread and a queue of one. The third submission while the first two are still busy returns **429** and `Try again later`. A void `@Async` failure is stored by `MonitoringAsyncExceptionHandler` and does not escape the caller.

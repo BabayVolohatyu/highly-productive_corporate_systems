@@ -1,6 +1,8 @@
 package org.example.monitoring.server;
 
 import org.example.monitoring.aop.BudgetExceededException;
+import org.example.monitoring.asyncwork.HealthController;
+import org.example.monitoring.asyncwork.MaintenanceController;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,7 +11,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = {ServerController.class, AdminOverviewController.class})
+@RestControllerAdvice(assignableTypes = {
+        ServerController.class,
+        AdminOverviewController.class,
+        HealthController.class,
+        MaintenanceController.class
+})
 public class ApiExceptionHandler {
 
     @ExceptionHandler(NotFoundException.class)
