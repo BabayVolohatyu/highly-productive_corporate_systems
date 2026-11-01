@@ -1,0 +1,8 @@
+target/
+.git/
+.idea/
+.env
+lab_plans/
+lab_desc/
+defense_plans/
+presentation_plans/
