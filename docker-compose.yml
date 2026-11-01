@@ -30,8 +30,10 @@ services:
     volumes:
       - ./keycloak/realm-monitoring.json:/opt/keycloak/data/import/realm-monitoring.json:ro
 
-  app:
-    build: .
+  server-service:
+    build:
+      context: .
+      dockerfile: server-service/Dockerfile
     ports:
       - "8080:8080"
     environment:
@@ -50,6 +52,28 @@ services:
         condition: service_started
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS http://localhost:8080/ -o /dev/null"]
+      interval: 10s
+      timeout: 5s
+      retries: 20
+      start_period: 90s
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: notification-service/Dockerfile
+    ports:
+      - "8082:8082"
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: ${POSTGRES_DB:-monitoring}
+      POSTGRES_USER: ${POSTGRES_USER:-monitoring}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-monitoring}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost:8082/api/notifications -o /dev/null"]
       interval: 10s
       timeout: 5s
       retries: 20

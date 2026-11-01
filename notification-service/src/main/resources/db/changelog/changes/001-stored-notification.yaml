@@ -1,0 +1,33 @@
+databaseChangeLog:
+  - changeSet:
+      id: 001-stored-notification
+      author: lab7
+      changes:
+        - createTable:
+            tableName: stored_notification
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_stored_notification
+              - column:
+                  name: event_id
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_stored_notification_event
+              - column:
+                  name: message
+                  type: varchar(512)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: timestamp with time zone
+                  constraints:
+                    nullable: false

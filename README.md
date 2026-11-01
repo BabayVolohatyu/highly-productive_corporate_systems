@@ -130,3 +130,12 @@ Work on branch **`lab5`**. Creating a server returns as soon as the row is saved
 Work on branch **`lab6`**. Quartz uses the JDBC job store. Liquibase creates the `qrtz_*` tables, and `spring.quartz.jdbc.initialize-schema` is `never`.
 
 `QuartzConfig` declares both jobs. `stale-down-reminder` has a daily cron trigger (`Europe/Kyiv`, misfire do-nothing, threshold 12 hours) and a five-minute trigger (misfire next-with-remaining, threshold stays at the job default of 24). `catalog-digest` runs hourly. Jobs only read `JobDataMap` values and call one service method. Running the same window twice does not insert another row. A transient failure is recorded and retried at most three times. Both jobs are `@DisallowConcurrentExecution`. A missing map key throws `IllegalStateException`.
+
+## Lab 7: multi-module build
+
+Work on branch **`lab7`**. The root `pom.xml` has `<packaging>pom</packaging>` and modules `common`, `server-service`, and `notification-service`. Each service module points its `<parent>` at that root POM, has its own `main`, `application.yml`, port, tests, and `Dockerfile`. `server-service` listens on 8080. `notification-service` listens on 8082. `junit-jupiter` is declared only in the root `<dependencies>`. Neither service depends on the other. Shared records live in `common`.
+
+```text
+docker compose up --build -d
+mvnw.cmd verify -Dtest=!*ApiSecurityTest
+```
