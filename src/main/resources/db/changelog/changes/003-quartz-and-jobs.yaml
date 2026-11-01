@@ -1,0 +1,71 @@
+databaseChangeLog:
+  - changeSet:
+      id: 003-quartz-tables
+      author: lab6
+      changes:
+        - sqlFile:
+            path: quartz-postgres.sql
+            relativeToChangelogFile: true
+            splitStatements: true
+            stripComments: true
+  - changeSet:
+      id: 003-server-reminder
+      author: lab6
+      changes:
+        - createTable:
+            tableName: server_reminder
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_server_reminder
+              - column:
+                  name: server_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: window_key
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: threshold_hours
+                  type: int
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            tableName: server_reminder
+            columnNames: server_id, window_key
+            constraintName: uq_server_reminder_window
+  - changeSet:
+      id: 003-catalog-digest
+      author: lab6
+      changes:
+        - createTable:
+            tableName: catalog_digest
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+                    primaryKeyName: pk_catalog_digest
+              - column:
+                  name: digest_key
+                  type: varchar(64)
+                  constraints:
+                    nullable: false
+                    unique: true
+                    uniqueConstraintName: uq_catalog_digest_key
+              - column:
+                  name: server_count
+                  type: bigint
+                  constraints:
+                    nullable: false

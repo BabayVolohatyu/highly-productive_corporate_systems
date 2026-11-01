@@ -124,3 +124,9 @@ Work on branch **`lab5`**. Creating a server returns as soon as the row is saved
 `GET /api/servers/{id}/health` starts a reachability probe and a certificate lookup together, both returning `CompletableFuture`, and combines them with `thenCombine`. A failed lookup becomes `UNAVAILABLE` instead of failing the request. The wait is capped at 2 seconds.
 
 `POST /api/servers/{id}/maintenance` uses a pool of one thread and a queue of one. The third submission while the first two are still busy returns **429** and `Try again later`. A void `@Async` failure is stored by `MonitoringAsyncExceptionHandler` and does not escape the caller.
+
+## Lab 6: Quartz
+
+Work on branch **`lab6`**. Quartz uses the JDBC job store. Liquibase creates the `qrtz_*` tables, and `spring.quartz.jdbc.initialize-schema` is `never`.
+
+`QuartzConfig` declares both jobs. `stale-down-reminder` has a daily cron trigger (`Europe/Kyiv`, misfire do-nothing, threshold 12 hours) and a five-minute trigger (misfire next-with-remaining, threshold stays at the job default of 24). `catalog-digest` runs hourly. Jobs only read `JobDataMap` values and call one service method. Running the same window twice does not insert another row. A transient failure is recorded and retried at most three times. Both jobs are `@DisallowConcurrentExecution`. A missing map key throws `IllegalStateException`.
