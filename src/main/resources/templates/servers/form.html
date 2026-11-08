@@ -12,7 +12,6 @@
 </header>
 <main class="page">
     <h1 th:text="${editing} ? 'Edit server' : 'New server'">Server</h1>
-    <p class="error" th:if="${error}" th:text="${error}">Error</p>
     <form class="form"
           th:action="${editing} ? @{/servers/{id}(id=${serverId})} : @{/servers}"
           th:object="${server}" method="post">
