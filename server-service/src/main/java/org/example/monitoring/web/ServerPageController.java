@@ -9,7 +9,9 @@ import org.example.monitoring.server.ServerResponse;
 import org.example.monitoring.server.ServerService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -35,12 +37,13 @@ public class ServerPageController {
         if (!model.containsAttribute("server")) {
             model.addAttribute("server", new ServerRequest("", "", "DEV", "UNKNOWN", ""));
         }
+        ensureBinding(model);
         prepareForm(model, false, null);
         return "servers/form";
     }
 
     @PostMapping("/servers")
-    public String create(@Valid ServerRequest server,
+    public String create(@Valid @ModelAttribute("server") ServerRequest server,
                          BindingResult binding,
                          Model model,
                          RedirectAttributes redirect) {
@@ -70,13 +73,14 @@ public class ServerPageController {
                     existing.status(),
                     existing.description() == null ? "" : existing.description()));
         }
+        ensureBinding(model);
         prepareForm(model, true, id);
         return "servers/form";
     }
 
     @PostMapping("/servers/{id}")
     public String update(@PathVariable Long id,
-                         @Valid ServerRequest server,
+                         @Valid @ModelAttribute("server") ServerRequest server,
                          BindingResult binding,
                          Model model,
                          RedirectAttributes redirect) {
@@ -107,6 +111,14 @@ public class ServerPageController {
             redirect.addFlashAttribute("message", exception.getMessage());
         }
         return "redirect:/servers";
+    }
+
+    private void ensureBinding(Model model) {
+        Object server = model.getAttribute("server");
+        String key = BindingResult.MODEL_KEY_PREFIX + "server";
+        if (server != null && !model.containsAttribute(key)) {
+            model.addAttribute(key, new BeanPropertyBindingResult(server, "server"));
+        }
     }
 
     private void prepareForm(Model model, boolean editing, Long serverId) {
