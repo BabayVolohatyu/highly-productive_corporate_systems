@@ -5,13 +5,13 @@ import org.example.common.CatalogEventJson;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageDeliveryMode;
 import org.springframework.amqp.core.MessageProperties;
-import org.springframework.amqp.support.converter.MessageConverter;
+import org.springframework.amqp.support.converter.SmartMessageConverter;
 import org.springframework.stereotype.Component;
 
 import java.nio.charset.StandardCharsets;
 
 @Component
-public class CatalogEventMessageConverter implements MessageConverter {
+public class CatalogEventMessageConverter implements SmartMessageConverter {
 
     @Override
     public Message toMessage(Object object, MessageProperties properties) {
@@ -24,5 +24,10 @@ public class CatalogEventMessageConverter implements MessageConverter {
     @Override
     public Object fromMessage(Message message) {
         return CatalogEventJson.read(new String(message.getBody(), StandardCharsets.UTF_8));
+    }
+
+    @Override
+    public Object fromMessage(Message message, Object conversionHint) {
+        return fromMessage(message);
     }
 }
