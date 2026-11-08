@@ -32,6 +32,9 @@ services:
 
   rabbitmq:
     image: rabbitmq:4-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-monitoring}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-monitoring}
     ports:
       - "5672:5672"
       - "15672:15672"
@@ -53,6 +56,8 @@ services:
       KEYCLOAK_API_CLIENT_SECRET: ${KEYCLOAK_API_CLIENT_SECRET:-monitoring-api-secret}
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-monitoring}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-monitoring}
       NOTIFICATION_CLIENT_MODE: grpc
       NOTIFICATION_HTTP_URL: http://notification-service:8082
       NOTIFICATION_GRPC_ADDRESS: notification-service:9090
@@ -90,6 +95,8 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-monitoring}
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
+      RABBITMQ_USER: ${RABBITMQ_USER:-monitoring}
+      RABBITMQ_PASSWORD: ${RABBITMQ_PASSWORD:-monitoring}
       NOTIFICATION_GRPC_SERVER_ENABLED: "true"
       NOTIFICATION_GRPC_PORT: 9090
     depends_on:

@@ -16,9 +16,11 @@ spring:
     change-log: classpath:db/changelog/db.changelog-master.yaml
     database-change-log-table: notification_changelog
     database-change-log-lock-table: notification_changelog_lock
-  rabbitmq:
+  amqp:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USER:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
 
 notification:
   grpc:
