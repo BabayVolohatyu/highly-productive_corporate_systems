@@ -13,18 +13,21 @@ public class CatalogQueueDeclarationRunner implements ApplicationRunner {
     private final String host;
     private final String username;
     private final String password;
+    private final int attempts;
 
     public CatalogQueueDeclarationRunner(@Value("${spring.amqp.host:localhost}") String host,
                                          @Value("${spring.amqp.username:guest}") String username,
-                                         @Value("${spring.amqp.password:guest}") String password) {
+                                         @Value("${spring.amqp.password:guest}") String password,
+                                         @Value("${catalog.queue.declare-attempts:30}") int attempts) {
         this.host = host;
         this.username = username;
         this.password = password;
+        this.attempts = attempts;
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        for (int attempt = 0; attempt < 30; attempt++) {
+        for (int attempt = 0; attempt < attempts; attempt++) {
             if (DurableQueueDeclaration.declare(host, username, password, CatalogEvents.QUEUE)) {
                 return;
             }
