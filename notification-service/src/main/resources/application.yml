@@ -19,3 +19,9 @@ spring:
   rabbitmq:
     host: ${RABBITMQ_HOST:localhost}
     port: ${RABBITMQ_PORT:5672}
+
+notification:
+  grpc:
+    server:
+      enabled: ${NOTIFICATION_GRPC_SERVER_ENABLED:false}
+      port: ${NOTIFICATION_GRPC_PORT:9090}

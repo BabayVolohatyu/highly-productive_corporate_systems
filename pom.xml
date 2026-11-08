@@ -20,6 +20,7 @@
 
     <modules>
         <module>common</module>
+        <module>contracts</module>
         <module>server-service</module>
         <module>notification-service</module>
     </modules>
@@ -27,6 +28,8 @@
     <properties>
         <java.version>27</java.version>
         <mapstruct.version>1.6.3</mapstruct.version>
+        <grpc.version>1.69.0</grpc.version>
+        <protobuf.version>4.29.3</protobuf.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

@@ -41,6 +41,8 @@ class NotificationInboxTest {
         ArgumentCaptor<StoredNotification> saved = ArgumentCaptor.forClass(StoredNotification.class);
         verify(repository).save(saved.capture());
         assertThat(saved.getValue().getEventId()).isEqualTo("evt-1");
+        assertThat(saved.getValue().getHostname()).isEqualTo("edge-1");
+        assertThat(saved.getValue().getStatus()).isEqualTo("UP");
         verify(repository, never()).delete(any());
     }
 }

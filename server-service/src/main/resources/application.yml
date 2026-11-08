@@ -49,3 +49,14 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: ${KEYCLOAK_INTERNAL_ISSUER:http://localhost:8081/realms/monitoring}/protocol/openid-connect/certs
+
+notification:
+  client:
+    mode: ${NOTIFICATION_CLIENT_MODE:http}
+    http:
+      base-url: ${NOTIFICATION_HTTP_URL:http://localhost:8082}
+      connect-timeout: ${NOTIFICATION_HTTP_CONNECT_TIMEOUT:500ms}
+      read-timeout: ${NOTIFICATION_HTTP_READ_TIMEOUT:2s}
+    grpc:
+      address: ${NOTIFICATION_GRPC_ADDRESS:localhost:9090}
+      deadline: ${NOTIFICATION_GRPC_DEADLINE:2s}

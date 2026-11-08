@@ -9,5 +9,9 @@ public interface StoredNotificationRepository extends JpaRepository<StoredNotifi
 
     Optional<StoredNotification> findByEventId(String eventId);
 
+    Optional<StoredNotification> findFirstByHostnameOrderByIdDesc(String hostname);
+
+    int countByHostname(String hostname);
+
     List<StoredNotification> findAllByOrderByIdAsc();
 }

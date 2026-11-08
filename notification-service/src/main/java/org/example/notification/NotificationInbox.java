@@ -23,6 +23,8 @@ public class NotificationInbox {
                 .orElseGet(() -> NotificationView.from(repository.save(StoredNotification.create(
                         event.eventId(),
                         event.type() + " " + event.hostname() + " " + event.status(),
+                        event.hostname(),
+                        event.status(),
                         Instant.now()))));
     }
 

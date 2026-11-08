@@ -143,3 +143,11 @@ mvnw.cmd verify -Dtest=!*ApiSecurityTest
 ## Lab 8: message broker
 
 Work on branch **`lab8`**. RabbitMQ is a service in `docker-compose.yml`. Creating a server, updating a server, and `POST /api/servers/{id}/reports` each write one outbox row in the same transaction. `OutboxDispatcher` publishes that row to the durable queue `catalog.events` only after commit. `notification-service` does not call `server-service` over HTTP and does not use its classes. It reads `CatalogEvent` from `common`, stores a row, and shows it at `GET http://localhost:8082/api/notifications`. The same `eventId` does not create a second row. `RABBITMQ_HOST` is `rabbitmq` in Compose and defaults to `localhost` for the IDE.
+
+## Lab 9: interservice communication
+
+Work on branch **`lab9`**. `server-service` asks `notification-service` for alert status, alert count, and a delivery receipt. Controllers call `OperatorNoticeService`, which depends only on `AlertStatusLookup`, `AlertCountLookup`, and `DeliveryReceiptLookup`.
+
+`notification.client.mode` selects the adapter: `http` (Spring HTTP interface over `RestClient`) or `grpc`. Any other value stops startup. The gRPC contract is `contracts/src/main/proto/notification_lookup.proto`; the Java stubs are generated during the build. The gRPC server in `notification-service` is off unless `NOTIFICATION_GRPC_SERVER_ENABLED=true`, and it returns `NOT_FOUND` when the row is missing. HTTP connect and read timeouts and the gRPC deadline come from configuration. Both adapters turn a missing row into 404 and a timeout, connection failure, or 5xx into 503.
+
+Compose starts the stack with gRPC enabled. From an IDE the default mode is HTTP and the gRPC server stays off.

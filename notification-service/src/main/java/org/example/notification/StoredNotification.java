@@ -26,13 +26,25 @@ public class StoredNotification {
     @Column(nullable = false)
     private Instant createdAt;
 
+    @Column(nullable = false)
+    private String hostname = "";
+
+    @Column(nullable = false, length = 64)
+    private String status = "";
+
     protected StoredNotification() {
     }
 
     public static StoredNotification create(String eventId, String message, Instant createdAt) {
+        return create(eventId, message, "", "", createdAt);
+    }
+
+    public static StoredNotification create(String eventId, String message, String hostname, String status, Instant createdAt) {
         StoredNotification row = new StoredNotification();
         row.eventId = eventId;
         row.message = message;
+        row.hostname = hostname == null ? "" : hostname;
+        row.status = status == null ? "" : status;
         row.createdAt = createdAt;
         return row;
     }
@@ -51,5 +63,13 @@ public class StoredNotification {
 
     public Instant getCreatedAt() {
         return createdAt;
+    }
+
+    public String getHostname() {
+        return hostname;
+    }
+
+    public String getStatus() {
+        return status;
     }
 }

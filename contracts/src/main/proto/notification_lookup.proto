@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "org.example.contracts.notification";
+
+package notification.lookup;
+
+service NotificationLookup {
+  rpc GetAlertStatus (HostnameRequest) returns (AlertStatusReply);
+  rpc CountAlerts (HostnameRequest) returns (AlertCountReply);
+  rpc GetDeliveryReceipt (EventRequest) returns (DeliveryReceiptReply);
+}
+
+message HostnameRequest {
+  string hostname = 1;
+}
+
+message EventRequest {
+  string event_id = 1;
+}
+
+message AlertStatusReply {
+  string hostname = 1;
+  string status = 2;
+  string message = 3;
+}
+
+message AlertCountReply {
+  string hostname = 1;
+  int32 count = 2;
+}
+
+message DeliveryReceiptReply {
+  string event_id = 1;
+  bool delivered = 2;
+  string message = 3;
+}

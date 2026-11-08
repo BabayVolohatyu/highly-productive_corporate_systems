@@ -3,6 +3,9 @@ package org.example.monitoring.server;
 import org.example.monitoring.aop.BudgetExceededException;
 import org.example.monitoring.asyncwork.HealthController;
 import org.example.monitoring.asyncwork.MaintenanceController;
+import org.example.monitoring.lookup.OperatorNoticeController;
+import org.example.monitoring.lookup.RemoteResourceNotFoundException;
+import org.example.monitoring.lookup.RemoteServiceUnavailableException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,7 +18,8 @@ import java.util.Map;
         ServerController.class,
         AdminOverviewController.class,
         HealthController.class,
-        MaintenanceController.class
+        MaintenanceController.class,
+        OperatorNoticeController.class
 })
 public class ApiExceptionHandler {
 
@@ -34,6 +38,18 @@ public class ApiExceptionHandler {
     @ExceptionHandler(InvalidRequestException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public Map<String, String> invalid(InvalidRequestException exception) {
+        return Map.of("error", exception.getMessage());
+    }
+
+    @ExceptionHandler(RemoteResourceNotFoundException.class)
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public Map<String, String> remoteMissing(RemoteResourceNotFoundException exception) {
+        return Map.of("error", exception.getMessage());
+    }
+
+    @ExceptionHandler(RemoteServiceUnavailableException.class)
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public Map<String, String> remoteUnavailable(RemoteServiceUnavailableException exception) {
         return Map.of("error", exception.getMessage());
     }
 

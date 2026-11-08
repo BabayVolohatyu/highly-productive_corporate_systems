@@ -1,0 +1,20 @@
+databaseChangeLog:
+  - changeSet:
+      id: 002-notification-lookup-columns
+      author: lab9
+      changes:
+        - addColumn:
+            tableName: stored_notification
+            columns:
+              - column:
+                  name: hostname
+                  type: varchar(255)
+                  defaultValue: ""
+                  constraints:
+                    nullable: false
+              - column:
+                  name: status
+                  type: varchar(64)
+                  defaultValue: ""
+                  constraints:
+                    nullable: false

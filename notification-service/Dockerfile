@@ -3,10 +3,12 @@ WORKDIR /app
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 COPY common/pom.xml common/pom.xml
+COPY contracts/pom.xml contracts/pom.xml
 COPY server-service/pom.xml server-service/pom.xml
 COPY notification-service/pom.xml notification-service/pom.xml
 RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 COPY common/src common/src
+COPY contracts/src contracts/src
 COPY notification-service/src notification-service/src
 RUN ./mvnw -B -DskipTests -pl notification-service -am package
 
