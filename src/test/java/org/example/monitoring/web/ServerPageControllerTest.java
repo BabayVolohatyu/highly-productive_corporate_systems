@@ -102,7 +102,7 @@ class ServerPageControllerTest {
 
         // Assert
         assertThat(view).isEqualTo("servers/form");
-        assertThat(model.getAttribute("error")).isEqualTo("Hostname already exists");
+        verify(bindingResult).reject("conflict", "Hostname already exists");
     }
 
     @Test
@@ -151,7 +151,7 @@ class ServerPageControllerTest {
 
         // Assert
         assertThat(view).isEqualTo("servers/form");
-        assertThat(model.getAttribute("error")).isEqualTo("ip_address is required");
+        verify(bindingResult).reject("conflict", "ip_address is required");
     }
 
     @Test
