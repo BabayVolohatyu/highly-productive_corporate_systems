@@ -5,3 +5,18 @@ spring:
       - org.springframework.boot.autoconfigure.quartz.QuartzAutoConfiguration
       - org.springframework.boot.amqp.autoconfigure.RabbitAutoConfiguration
       - org.springframework.boot.autoconfigure.amqp.RabbitAutoConfiguration
+
+notification:
+  client:
+    mode: http
+    http:
+      base-url: http://127.0.0.1:9
+      connect-timeout: 500ms
+      read-timeout: 2s
+    grpc:
+      address: 127.0.0.1:9090
+      deadline: 2s
+
+catalog:
+  queue:
+    declare-attempts: 0

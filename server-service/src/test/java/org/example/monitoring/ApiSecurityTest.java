@@ -13,6 +13,7 @@ import org.springframework.security.oauth2.client.registration.ClientRegistratio
 import org.springframework.security.oauth2.client.registration.InMemoryClientRegistrationRepository;
 import org.springframework.security.oauth2.core.AuthorizationGrantType;
 import org.springframework.security.oauth2.core.ClientAuthenticationMethod;
+import org.springframework.amqp.client.AmqpClient;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtDecoder;
 import org.springframework.security.test.context.support.WithMockUser;
@@ -23,6 +24,12 @@ import org.testcontainers.containers.PostgreSQLContainer;
 import org.testcontainers.junit.jupiter.Container;
 import org.testcontainers.junit.jupiter.Testcontainers;
 
+import java.util.concurrent.CompletableFuture;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -143,6 +150,18 @@ class ApiSecurityTest {
                     .header("alg", "none")
                     .claim("sub", "test")
                     .build();
+        }
+
+        @Bean
+        AmqpClient amqpClient() {
+            AmqpClient client = mock(AmqpClient.class);
+            AmqpClient.SendSpec send = mock(AmqpClient.SendSpec.class);
+            AmqpClient.SendSpec.ConvertAndSendSpec convert = mock(AmqpClient.SendSpec.ConvertAndSendSpec.class);
+            when(client.to(any())).thenReturn(send);
+            when(send.body(any())).thenReturn(convert);
+            when(convert.durable(anyBoolean())).thenReturn(convert);
+            when(convert.send()).thenReturn(CompletableFuture.completedFuture(true));
+            return client;
         }
     }
 }
