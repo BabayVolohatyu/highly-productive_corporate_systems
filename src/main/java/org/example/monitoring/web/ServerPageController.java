@@ -51,8 +51,7 @@ public class ServerPageController {
         try {
             serverService.create(server);
         } catch (ConflictException | InvalidRequestException exception) {
-            binding.reject("server", exception.getMessage());
-            model.addAttribute("error", exception.getMessage());
+            binding.reject("conflict", exception.getMessage());
             prepareForm(model, false, null);
             return "servers/form";
         }
@@ -91,8 +90,7 @@ public class ServerPageController {
             redirect.addFlashAttribute("message", exception.getMessage());
             return "redirect:/servers";
         } catch (ConflictException | InvalidRequestException exception) {
-            binding.reject("server", exception.getMessage());
-            model.addAttribute("error", exception.getMessage());
+            binding.reject("conflict", exception.getMessage());
             prepareForm(model, true, id);
             return "servers/form";
         }
